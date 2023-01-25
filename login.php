@@ -1,6 +1,28 @@
 <?php
+require_once("includes/config.php");
+require_once("includes/classes/FormSanitizer.php");
+require_once("includes/classes/Account.php");
+require_once("includes/classes/Constants.php");
+
+$account = new Account($con);
+
 if (isset($_POST["submitButton"])) {
-    // echo "form ok";
+    $email = FormSanitizer::sanitizeFormEmail($_POST["email"]);
+    $password = FormSanitizer::santizeFormPassword($_POST["password"]);
+
+    $success = $account->login($email, $password);
+
+    if ($success) {
+        $_SESSION["userLoggedIn"] = $email;
+        header("Location: index.php");
+    }
+}
+
+function getInputValue($name)
+{
+    if (isset($_POST[$name])) {
+        echo $_POST[$name];
+    }
 }
 ?>
 
@@ -24,8 +46,11 @@ if (isset($_POST["submitButton"])) {
                 <span>to continue to Netflix Prime</span>
             </div>
             <form method="POST" action="">
-                <input type="text" placeholder="Username" name="username" id="username" required>
-                <input type="password" placeholder="Password" name="password" id="password" required>
+                <?php echo $account->getError(Constants::$loginFailed); ?>
+                <input type="email" placeholder="Email" name="email" id="email" value="<?php getInputValue("email"); ?>"
+                    required>
+                <input type="password" placeholder="Password" name="password" id="password"
+                    value="<?php getInputValue("password"); ?>" required>
                 <input type="submit" value="SUBMIT" name="submitButton">
             </form>
 
