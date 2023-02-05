@@ -10,7 +10,7 @@ class Video
         if (is_array($input)) {
             $this->sqlData = $input;
         } else {
-            $query = $this->con->prepare("SELECT * FROM entities WHERE id=:id");
+            $query = $this->con->prepare("SELECT * FROM videos WHERE id=:id");
             $query->bindValue(":id", $input);
             $query->execute();
 
@@ -43,6 +43,13 @@ class Video
     public function getEpisodeNumber()
     {
         return $this->sqlData["episode"];
+    }
+
+    public function incrementViews()
+    {
+        $query = $this->con->prepare("UPDATE videos SET views=views+1 WHERE id=:id");
+        $query->bindValue(":id", $this->getId());
+        $query->execute();
     }
 }
 
